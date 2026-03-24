@@ -1,0 +1,15 @@
+{
+  "name": "Construtor de Provas Pro",
+  "short_name": "Provas",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a8a",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3426/3426653.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
