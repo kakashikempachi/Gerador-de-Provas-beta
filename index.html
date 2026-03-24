@@ -1,76 +1,41 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor de Provas v9.0</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
-    <style>
-        :root { --cobalt: #1e3a8a; --emerald: #059669; }
-        body { font-family: sans-serif; background: #f1f5f9; margin: 0; padding-bottom: 80px; }
-        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
-        .toolbar { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: sticky; top: 10px; z-index: 1000; }
-        
-        /* Botões Principais */
-        .btn-add { background: var(--cobalt); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; flex: 1; }
-        .btn-pdf { width: 100%; background: var(--emerald); color: white; border: none; padding: 15px; border-radius: 8px; margin-top: 10px; font-weight: bold; cursor: pointer; }
+  <meta charset="UTF-8">
+  <title>Gerador de Provas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        /* Card de Questão */
-        .card-questao { background: white; padding: 20px; border-radius: 8px; margin-top: 15px; border-left: 6px solid var(--cobalt); position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .btn-remover { position: absolute; right: 10px; top: 10px; color: #ef4444; border: none; background: none; font-size: 20px; cursor: pointer; }
-        
-        textarea { width: 100%; min-height: 60px; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
-        input[type="text"], input[type="number"] { padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin: 4px 0; width: 100%; box-sizing: border-box; }
-
-        /* Ajustes Específicos */
-        .grid-ligue { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .area-foto { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 10px; border-radius: 8px; text-align: center; }
-        .img-preview { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 10px; }
-        .img-preview img { width: 60px; height: 60px; object-fit: cover; border: 1px solid #ddd; }
-
-        /* Modal */
-        #modal-busca { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center; }
-        .modal-inner { background:white; padding:20px; border-radius:10px; width:90%; max-width:400px; }
-
-        /* PDF Oculto */
-        #pdf-folha { display: none; background: white; width: 210mm; padding: 20mm; color: black; }
-    </style>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="container">
-    <div class="toolbar">
-        <input type="text" id="nome-escola" placeholder="Nome da Escola..." style="margin-bottom: 10px;">
-        <div style="display: flex; gap: 8px;">
-            <select id="tipo-selecionado" style="flex: 2; padding: 10px; border-radius: 8px;">
-                <option value="multipla">🔘 Múltipla Escolha</option>
-                <option value="imagem">🖼️ Questão com Imagem</option>
-                <option value="ligue">🔗 Ligue os Pontos</option>
-                <option value="dissertativa">📝 Dissertativa (Linhas)</option>
-                <option value="vf">⚖️ Verdadeiro ou Falso</option>
-            </select>
-            <button class="btn-add" onclick="criarQuestao()">+ Add</button>
-        </div>
-        <button class="btn-pdf" onclick="gerarPDF()">📥 GERAR PROVA (PDF)</button>
-    </div>
+<header>
+  <h1>Gerador de Provas</h1>
+  <button onclick="window.print()">📄 Exportar / Imprimir</button>
+</header>
 
-    <div id="lista-questoes"></div>
-</div>
+<section class="config">
+  <input type="text" placeholder="Nome da Prova" id="titulo">
+  <input type="text" placeholder="Disciplina">
+  <input type="text" placeholder="Série">
+</section>
 
-<div id="modal-busca">
-    <div class="modal-inner">
-        <h4>Buscar no Google (Pixabay)</h4>
-        <input type="text" id="termo-busca" placeholder="Ex: Mapa, Corpo Humano...">
-        <button onclick="buscarImagens()" style="width:100%; margin-top:5px; padding:8px;">Pesquisar</button>
-        <button onclick="fecharModal()" style="width:100%; margin-top:5px; background:#ddd; border:none; padding:8px;">Fechar</button>
-        <div id="resultados-busca" style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:10px; max-height:200px; overflow-y:auto;"></div>
-    </div>
-</div>
+<section>
+  <button onclick="adicionarQuestao('multipla')">➕ Múltipla Escolha</button>
+  <button onclick="adicionarQuestao('dissertativa')">➕ Dissertativa</button>
+  <button onclick="adicionarQuestao('vf')">➕ Verdadeiro/Falso</button>
+  <button onclick="adicionarQuestao('lacuna')">➕ Lacuna</button>
+</section>
 
-<div id="pdf-folha">
-    <div id="pdf-corpo"></div>
-</div>
+<section id="prova"></section>
 
-<script src="script.js"></script>
+<script src="app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+</script>
+
 </body>
 </html>
