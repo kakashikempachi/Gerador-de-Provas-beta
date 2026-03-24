@@ -1,12 +1,125 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
 body {
-  background: #f4f6f9 !important;
-  font-family: 'Inter', sans-serif !important;
+  background: #f4f6f9;
+  color: #2c3e50;
+}
+
+.main {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 15px;
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
 button {
-  background: #3498db !important;
-  color: white !important;
-  border-radius: 10px !important;
-  padding: 12px !important;
-  border: none !important;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  background: #3498db;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button:hover {
+  background: #2980b9;
+}
+
+.export {
+  background: #27ae60;
+}
+
+.cabecalho {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.cabecalho input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.questao {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.linha {
+  border-bottom: 1px solid black;
+  margin: 6px 0;
+}
+
+.linha-curta {
+  border-bottom: 1px solid black;
+  width: 200px;
+  height: 20px;
+}
+
+.colunas {
+  display: flex;
+  gap: 20px;
+}
+
+.colunas input {
+  display: block;
+  margin: 5px 0;
+}
+
+img {
+  max-width: 100%;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+
+@media print {
+  button, .botoes {
+    display: none;
+  }
+
+  .main {
+    width: 210mm;
+    padding: 15mm;
+  }
+
+  .questao {
+    page-break-inside: avoid;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 15mm;
 }
