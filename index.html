@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Provas Pro v6.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
+    <style>
+        :root { --cobalt: #1e3a8a; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; }
+        .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
+        .toolbar { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); sticky; top: 10px; z-index: 1000; }
+        
+        .card-questao { background: white; padding: 20px; border-radius: 8px; margin-top: 15px; border-left: 6px solid var(--cobalt); position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .remover { position: absolute; right: 15px; top: 15px; color: #ef4444; cursor: pointer; border: none; background: none; font-size: 20px; }
+        
+        textarea { width: 100%; min-height: 60px; margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        input[type="number"] { padding: 5px; border: 1px solid #ccc; border-radius: 4px; width: 60px; }
+        input[type="text"] { width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #eee; border-radius: 4px; box-sizing: border-box; }
+
+        .controles-qtd { background: #f8fafc; padding: 10px; border-radius: 6px; margin-bottom: 10px; font-size: 14px; display: flex; align-items: center; gap: 10px; border: 1px solid #e2e8f0; }
+        .grid-duas-colunas { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+        /* Estilos do PDF */
+        #folha-a4 { background: white; width: 210mm; margin: auto; display: none; color: black; }
+        .pagina-pdf { padding: 20mm; min-height: 297mm; box-sizing: border-box; }
+        .cabecalho-pdf { border: 2pt solid black; padding: 15px; margin-bottom: 30px; font-size: 12pt; }
+        .q-pdf { margin-bottom: 35px; page-break-inside: avoid; display: block; width: 100%; }
+        .ligue-pdf { display: flex; justify-content: space-between; margin: 15px 0; }
+        .col-pdf { width: 45%; }
+        .item-ligue { margin: 12px 0; display: flex; align-items: center; gap: 8px; }
+        .circulo { width: 10px; height: 10px; border: 1pt solid black; border-radius: 50%; display: inline-block; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="toolbar">
+        <strong>🏫 Nome da Escola:</strong>
+        <input type="text" id="input-escola" placeholder="Digite o nome da escola aqui..." style="margin: 10px 0;">
+        
+        <div style="display: flex; gap: 10px;">
+            <select id="select-tipo" style="flex: 1; padding: 10px; border-radius: 8px;">
+                <option value="multipla">🔘 Múltipla Escolha</option>
+                <option value="ligue">🔗 Ligue os Pontos / Colunas</option>
+                <option value="vf">⚖️ Verdadeiro ou Falso</option>
+                <option value="dissertativa">📝 Dissertativa (Linhas)</option>
+                <option value="imagem">🖼️ Imagens com Legenda</option>
+            </select>
+            <button onclick="adicionarQuestao()" style="flex: 1; background: var(--cobalt); color: white; border: none; border-radius: 8px; cursor: pointer;">＋ Adicionar Questão</button>
+        </div>
+        <button onclick="gerarPDF()" style="width: 100%; background: #059669; color: white; border: none; padding: 15px; border-radius: 8px; margin-top: 10px; font-weight: bold; cursor: pointer;">📥 Gerar Prova (PDF)</button>
+    </div>
+
+    <div id="editor"></div>
+</div>
+
+<div id="folha-a4">
+    <div class="pagina-pdf">
+        <div class="cabecalho-pdf">
+            <center><strong id="pdf-escola">NOME DA ESCOLA</strong></center>
+            <p>ALUNO(A): ________________________________________________ DATA: ___/___/___</p>
+            <p>PROFESSOR(A): ___________________________________________ SÉRIE: _________</p>
+        </div>
+        <div id="pdf-conteudo"></div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
