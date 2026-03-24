@@ -1,42 +1,81 @@
 body {
   font-family: Arial;
-  margin: 20px;
   background: #f5f5f5;
+  margin: 0;
 }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-button {
-  margin: 5px;
-  padding: 8px 12px;
-  cursor: pointer;
-}
-
-.config input {
-  display: block;
-  margin: 5px 0;
-  padding: 8px;
-  width: 100%;
+/* ÁREA DE EDIÇÃO */
+header, section {
+  padding: 10px;
 }
 
 .questao {
   background: white;
   padding: 15px;
-  margin-top: 10px;
+  margin: 10px;
   border-radius: 8px;
 }
 
-.linhas div {
+textarea {
+  width: 100%;
+  min-height: 60px;
+}
+
+/* ELEMENTOS */
+.linha {
   border-bottom: 1px solid black;
+  margin: 6px 0;
+}
+
+.linha-curta {
+  border-bottom: 1px solid black;
+  width: 200px;
+  height: 20px;
+}
+
+.conta {
+  border: 1px solid black;
+  height: 80px;
+  width: 200px;
+}
+
+.colunas {
+  display: flex;
+  gap: 20px;
+}
+
+.colunas input {
+  display: block;
   margin: 5px 0;
 }
 
-img {
-  max-width: 200px;
-  display: block;
-  margin-top: 10px;
+/* 🖨️ IMPRESSÃO PROFISSIONAL */
+@media print {
+
+  body {
+    background: white;
+  }
+
+  header, button {
+    display: none;
+  }
+
+  #prova {
+    width: 210mm;
+    min-height: 297mm;
+
+    padding: 20mm;
+    box-sizing: border-box;
+  }
+
+  .questao {
+    page-break-inside: avoid;
+  }
+
+}
+
+/* 📄 CONFIGURAÇÃO A4 + SANGRIA */
+@page {
+  size: A4;
+  margin: 15mm;
 }
