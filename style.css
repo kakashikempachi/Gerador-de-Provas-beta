@@ -1,24 +1,89 @@
-body {
-  font-family: Arial;
-  background: #f5f5f5;
+/* RESET */
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial;
 }
 
-/* ÁREA DE EDIÇÃO */
-header, section {
+/* LAYOUT PRINCIPAL */
+.app {
+  display: flex;
+  height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 250px;
+  background: #2c3e50;
+  color: white;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.sidebar h2 {
+  margin-bottom: 10px;
+}
+
+.sidebar button {
+  width: 100%;
+  margin: 5px 0;
   padding: 10px;
+  border: none;
+  background: #34495e;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
 }
 
+.sidebar button:hover {
+  background: #1abc9c;
+}
+
+.sidebar .export {
+  background: #27ae60;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: #ecf0f1;
+}
+
+/* CABEÇALHO */
+.cabecalho {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.cabecalho input {
+  width: 100%;
+  padding: 8px;
+  margin: 5px 0;
+}
+
+.linha-aluno {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+/* QUESTÕES */
 .questao {
   background: white;
   padding: 15px;
-  margin: 10px;
-  border-radius: 8px;
+  margin-bottom: 15px;
+  border-radius: 10px;
 }
 
 textarea {
   width: 100%;
-  min-height: 60px;
+  margin: 10px 0;
+  padding: 8px;
 }
 
 /* ELEMENTOS */
@@ -49,32 +114,38 @@ textarea {
   margin: 5px 0;
 }
 
-/* 🖨️ IMPRESSÃO PROFISSIONAL */
+/* IMAGEM */
+img {
+  max-width: 200px;
+  margin-top: 10px;
+}
+
+/* 🖨️ IMPRESSÃO */
 @media print {
 
   body {
     background: white;
   }
 
-  header, button {
+  .sidebar {
     display: none;
   }
 
-  #prova {
-    width: 210mm;
-    min-height: 297mm;
+  .main {
+    padding: 0;
+  }
 
-    padding: 20mm;
-    box-sizing: border-box;
+  #prova, .cabecalho {
+    width: 210mm;
+    padding: 15mm;
   }
 
   .questao {
     page-break-inside: avoid;
   }
-
 }
 
-/* 📄 CONFIGURAÇÃO A4 + SANGRIA */
+/* A4 */
 @page {
   size: A4;
   margin: 15mm;
