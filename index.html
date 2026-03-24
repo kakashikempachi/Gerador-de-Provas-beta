@@ -1,68 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8">
-<title>Gerador de Provas</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Gerador de Provas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="styles.css">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Fonte moderna -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-<div class="app">
+  <div class="main">
 
-  <!-- MENU LATERAL -->
-  <aside class="sidebar">
-    <h2>📚 Questões</h2>
+    <!-- TÍTULO -->
+    <h1>📚 Gerador de Provas</h1>
 
-    <button onclick="adicionarQuestao('multipla')">Múltipla escolha</button>
-    <button onclick="adicionarQuestao('vf')">Verdadeiro/Falso</button>
-    <button onclick="adicionarQuestao('dissertativa')">Dissertativa</button>
-    <button onclick="adicionarQuestao('curta')">Resposta curta</button>
-    <button onclick="adicionarQuestao('lacuna')">Completar lacuna</button>
-    <button onclick="adicionarQuestao('colunas')">Ligar colunas</button>
-    <button onclick="adicionarQuestao('ordenar')">Ordenar sequência</button>
-    <button onclick="adicionarQuestao('circule')">Circule</button>
-    <button onclick="adicionarQuestao('arme')">Arme e resolva</button>
-
-    <hr>
-
-    <button class="export" onclick="window.print()">📄 Exportar PDF</button>
-  </aside>
-
-  <!-- ÁREA PRINCIPAL -->
-  <main class="main">
-
-    <!-- CABEÇALHO DA PROVA -->
-    <div class="cabecalho">
-      <input placeholder="Nome da Escola">
-      <input placeholder="Disciplina">
-      <input placeholder="Professor(a)">
-      <input placeholder="Série / Ano">
-      <input placeholder="Data">
-
-      <div class="linha-aluno">
-        Nome: ______________________________________
-        Nota: ______
-      </div>
-    </div>
-
-    <!-- QUESTÕES -->
-    <div id="prova"></div>
-
-  </main>
-
-</div>
-
-<script src="app.js"></script>
-
-<script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
-</script>
-
-</body>
-</html>
+    <!-- BOTÕES -->
+    <div class="botoes">
+      <button onclick="adicionarQuestao('multipla')">Múltipla</button>
+      <button onclick="adicionarQuestao('vf
