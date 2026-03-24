@@ -3,85 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor de Provas Pro v8.0</title>
+    <title>Gerador de Provas v8.5</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
     <style>
-        :root { --cobalt: #1e3a8a; --bg: #f1f5f9; --emerald: #059669; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding-bottom: 100px; }
-        .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
-        .toolbar { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: sticky; top: 10px; z-index: 1000; }
+        :root { --cobalt: #1e3a8a; --emerald: #059669; }
+        body { font-family: sans-serif; background: #f1f5f9; padding-bottom: 50px; }
+        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
         
-        .card-questao { background: white; padding: 20px; border-radius: 8px; margin-top: 15px; border-left: 6px solid var(--cobalt); position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .remover { position: absolute; right: 15px; top: 15px; color: #ef4444; cursor: pointer; border: none; background: none; font-size: 22px; }
+        /* Toolbar e Botões */
+        .toolbar { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-add { 
+            background: var(--cobalt); 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 8px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            width: 100%;
+        }
+        .btn-add:active { background: #111827; transform: scale(0.98); }
         
-        textarea { width: 100%; min-height: 70px; margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-        input[type="text"], input[type="number"], select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin: 5px 0; font-size: 14px; }
+        /* Cards */
+        .card-questao { background: white; padding: 20px; border-radius: 8px; margin-top: 15px; border-left: 6px solid var(--cobalt); position: relative; }
+        .remover { position: absolute; right: 10px; top: 10px; color: red; cursor: pointer; border: none; background: none; font-size: 20px; }
         
-        /* Área de Imagens */
-        .area-upload { background: #f8fafc; border: 2px dashed #cbd5e1; padding: 15px; border-radius: 8px; margin-top: 10px; text-align: center; }
-        .grid-fotos { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; justify-content: center; }
-        .foto-card { width: 130px; background: white; padding: 5px; border: 1px solid #e2e8f0; border-radius: 6px; }
-        .foto-card img { width: 100%; height: 90px; object-fit: cover; border-radius: 4px; }
-        
-        /* Modal */
-        #modal-busca { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center; }
-        .modal-body { background:white; padding:20px; border-radius:12px; width:90%; max-width:600px; max-height:80vh; overflow-y:auto; }
-        .resultados { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .resultados img { width: 100%; border-radius: 4px; cursor: pointer; border: 2px solid transparent; }
-        .resultados img:hover { border-color: var(--cobalt); }
+        /* Modal de Busca */
+        #modal-busca { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-inner { background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px; }
+        .img-result { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; max-height: 300px; overflow-y: auto; }
+        .img-result img { width: 100%; border-radius: 4px; cursor: pointer; }
 
-        /* PDF Hidden Sheet */
-        #folha-a4 { background: white; width: 210mm; margin: auto; display: none; color: black; }
-        .pagina-pdf { padding: 20mm; min-height: 297mm; box-sizing: border-box; }
-        .cabecalho-pdf { border: 2pt solid black; padding: 15px; margin-bottom: 30px; }
-        .q-bloco { margin-bottom: 35px; page-break-inside: avoid; display: block; }
+        /* PDF oculto */
+        #folha-a4 { display: none; background: white; width: 210mm; padding: 20mm; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="toolbar">
-        <strong>🏫 Identificação Escolar</strong>
-        <input type="text" id="escola-nome" placeholder="Nome da Instituição..." style="width:100%">
+        <h3>🏫 Editor de Provas</h3>
+        <input type="text" id="escola-nome" placeholder="Nome da Escola..." style="width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box;">
         
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-            <select id="tipo-questao" style="flex: 2;">
-                <option value="multipla">🔘 Múltipla Escolha</option>
-                <option value="imagem">🖼️ Questão com Imagem/Figura</option>
-                <option value="ligue">🔗 Ligue os Pontos / Colunas</option>
-                <option value="vf">⚖️ Verdadeiro ou Falso (Lista)</option>
-                <option value="dissertativa">📝 Dissertativa (Linhas)</option>
-                <option value="rascunho">🔢 Grade de Cálculo</option>
+        <div style="display: flex; gap: 10px;">
+            <select id="tipo-questao" style="flex: 2; padding: 10px; border-radius: 8px;">
+                <option value="multipla">Múltipla Escolha</option>
+                <option value="imagem">Questão com Imagem</option>
+                <option value="ligue">Ligue os Pontos</option>
+                <option value="dissertativa">Dissertativa</option>
             </select>
-            <button onclick="addQuestao()" style="flex: 1; background: var(--cobalt); color: white; border: none; border-radius: 8px; font-weight: bold;">+ Add Questão</button>
+            <button class="btn-add" id="btn-trigger">＋ Add Questão</button>
         </div>
-        <button onclick="gerarPDF()" style="width: 100%; background: var(--emerald); color: white; border: none; padding: 15px; border-radius: 8px; margin-top: 10px; font-weight: bold; cursor: pointer;">📥 Gerar Prova Final (PDF)</button>
+        
+        <button onclick="gerarPDF()" style="width:100%; margin-top:10px; padding:15px; background:var(--emerald); color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;">📥 BAIXAR PROVA (PDF)</button>
     </div>
 
     <div id="lista-questoes"></div>
 </div>
 
 <div id="modal-busca">
-    <div class="modal-body">
-        <h3>🔍 Buscar no Banco de Imagens</h3>
-        <div style="display:flex; gap:10px">
-            <input type="text" id="busca-input" placeholder="Ex: Planeta Terra, Mapa..." style="flex:1">
-            <button onclick="executarBusca()">Buscar</button>
-            <button onclick="fecharModal()" style="background:#eee">Fechar</button>
-        </div>
-        <div id="busca-resultados" class="resultados"></div>
+    <div class="modal-inner">
+        <h4>Buscar Imagem (PNG)</h4>
+        <input type="text" id="input-busca" placeholder="Ex: Mapa, Animais..." style="width:70%; padding:8px;">
+        <button onclick="buscarPixabay()">Ir</button>
+        <button onclick="fecharModal()">X</button>
+        <div id="resultados" class="img-result"></div>
     </div>
 </div>
 
 <div id="folha-a4">
-    <div class="pagina-pdf">
-        <div class="cabecalho-pdf">
-            <center><strong id="pdf-titulo">PROVA ESCOLAR</strong></center>
-            <p>ALUNO(A): _______________________________________ DATA: ___/___/___</p>
-            <p>PROF(A): ________________________________________ SÉRIE: _________</p>
-        </div>
-        <div id="pdf-corpo"></div>
-    </div>
+    <div id="pdf-conteudo"></div>
 </div>
 
 <script src="script.js"></script>
