@@ -1,8 +1,6 @@
-const CACHE = "prova-cache-v1";
-
 self.addEventListener("install", e => {
   e.waitUntil(
-    caches.open(CACHE).then(cache => {
+    caches.open("cache-v1").then(cache => {
       return cache.addAll([
         "./",
         "./index.html",
@@ -15,8 +13,6 @@ self.addEventListener("install", e => {
 
 self.addEventListener("fetch", e => {
   e.respondWith(
-    caches.match(e.request).then(res => {
-      return res || fetch(e.request);
-    })
+    caches.match(e.request).then(res => res || fetch(e.request))
   );
 });
