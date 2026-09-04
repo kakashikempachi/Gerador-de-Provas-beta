@@ -1,62 +1,1323 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Gerador de Provas</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Gerador de Provas Escolares</title>
+<meta name="description" content="Crie provas escolares prontas para imprimir, direto do celular ou computador.">
+<meta name="theme-color" content="#2563eb">
 
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Gerador de Provas">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #eff6ff;
+    --bg: #f1f5f9;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-soft: #64748b;
+    --danger: #dc2626;
+    --danger-light: #fef2f2;
+    --success: #16a34a;
+    --success-light: #f0fdf4;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    /* área segura para iPhone com notch */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  button { font-family: inherit; cursor: pointer; }
+  input, textarea, select { font-family: inherit; font-size: 16px; } /* 16px evita zoom no iOS */
 
-<!-- FORÇA ATUALIZAÇÃO DO CSS -->
-<link rel="stylesheet" href="styles.css?v=3">
+  .app-header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  .app-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .app-header h1 .logo {
+    width: 32px; height: 32px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  .btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background .15s, transform .05s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-outline { background: #fff; color: var(--primary); border: 1px solid var(--primary); }
+  .btn-outline:hover { background: var(--primary-light); }
+  .btn-success { background: var(--success); color: #fff; }
+  .btn-success:hover { background: #15803d; }
+  .btn-danger { background: var(--danger); color: #fff; }
+  .btn-danger:hover { background: #b91c1c; }
+  .btn-ghost { background: transparent; color: var(--text-soft); }
+  .btn-ghost:hover { background: var(--bg); }
+  .btn-sm { padding: 6px 10px; font-size: 13px; }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 0 16px;
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 57px;
+    z-index: 40;
+  }
+  .tab {
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-soft);
+    flex: 1;
+    max-width: 200px;
+  }
+  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+  .tab-content { display: none; padding: 16px; max-width: 1100px; margin: 0 auto; }
+  .tab-content.active { display: block; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; }
+  .field label { display: block; font-size: 13px; font-weight: 600; color: var(--text-soft); margin-bottom: 5px; }
+  .field input, .field textarea, .field select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    transition: border .15s, box-shadow .15s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+  }
+  .field textarea { resize: vertical; min-height: 60px; }
+  .field.full { grid-column: 1 / -1; }
+
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .question-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--primary-light);
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .question-head .q-number { font-weight: 700; color: var(--primary-dark); font-size: 14px; }
+  .question-head .q-type-badge {
+    background: #fff;
+    border: 1px solid var(--primary);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .q-actions { display: flex; gap: 4px; }
+  .q-actions .btn-icon {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 30px; height: 30px;
+    font-size: 15px;
+    color: var(--text-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .q-actions .btn-icon:hover { border-color: var(--primary); color: var(--primary); }
+  .q-actions .btn-icon.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+  .question-body { padding: 14px; }
+  .question-body .field { margin-bottom: 12px; }
+
+  .item-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+  .item-row .item-label {
+    width: 28px; height: 28px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--text-soft);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .item-row input {
+    flex: 1;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .item-row input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,.15); }
+  .item-row .btn-remove-item { background: none; border: none; color: var(--danger); font-size: 18px; line-height: 1; padding: 6px; border-radius: 6px; }
+  .item-row .btn-remove-item:hover { background: var(--danger-light); }
+
+  .add-item-btn {
+    background: transparent;
+    border: 1px dashed var(--primary);
+    color: var(--primary);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+  .add-item-btn:hover { background: var(--primary-light); }
+
+  .config-section { border-top: 1px dashed var(--border); padding-top: 14px; margin-top: 14px; }
+  .config-section .config-title {
+    font-size: 12px; font-weight: 700; color: var(--text-soft);
+    margin-bottom: 10px; text-transform: uppercase; letter-spacing: .4px;
+  }
+
+  .image-upload-area {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    color: var(--text-soft);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border .15s, background .15s;
+  }
+  .image-upload-area:hover { border-color: var(--primary); background: var(--primary-light); }
+  .image-preview { margin-top: 12px; }
+  .image-preview img { max-width: 100%; max-height: 220px; border-radius: 8px; border: 1px solid var(--border); }
+
+  .pair-row { display: grid; grid-template-columns: 1fr 30px 1fr 30px; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .pair-row .arrow { text-align: center; color: var(--text-soft); font-weight: 600; }
+
+  .empty-state { text-align: center; padding: 40px 16px; color: var(--text-soft); }
+  .empty-state .icon { font-size: 44px; margin-bottom: 12px; }
+  .empty-state p { margin-bottom: 14px; }
+
+  .type-selector { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .type-option {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    background: #fff;
+    text-align: left;
+    transition: border .15s, background .15s;
+  }
+  .type-option:hover { border-color: var(--primary); background: var(--primary-light); }
+  .type-option .t-icon { font-size: 20px; display: block; margin-bottom: 6px; }
+  .type-option .t-name { font-weight: 700; font-size: 13px; display: block; margin-bottom: 2px; }
+  .type-option .t-desc { font-size: 11px; color: var(--text-soft); }
+
+  /* Aviso de pontos */
+  .points-warning {
+    background: #fffbeb;
+    border: 1px solid #f59e0b;
+    color: #92400e;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .points-warning.show { display: block; }
+
+  /* Barra de ações de configuração da folha */
+  .sheet-settings {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  .sheet-settings .field { min-width: 120px; flex: 1; }
+
+  .preview-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .preview-toolbar .info { font-size: 13px; color: var(--text-soft); }
+
+  .sheet-wrap { background: #d1d5db; padding: 16px; border-radius: 4px; overflow-x: auto; }
+  .sheet {
+    background: #fff;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto;
+    padding: 20mm 18mm 20mm 18mm;
+    box-shadow: 0 4px 20px rgba(0,0,0,.15);
+    font-family: 'Times New Roman', Georgia, serif;
+    color: #000;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .sheet .school-name { text-align: center; font-size: 16px; font-weight: 700; text-transform: uppercase; }
+  .sheet .school-sub { text-align: center; font-size: 13px; }
+  .sheet .title { text-align: center; font-size: 18px; font-weight: 700; margin: 8px 0 8px; }
+  .sheet .header-table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+  .sheet .header-table td { border: 1px solid #000; padding: 5px 8px; }
+  .sheet .header-table td.label { font-weight: 700; width: 110px; background: #f8fafc; }
+  .sheet .instructions { border: 1px solid #000; padding: 8px 12px; margin: 12px 0; font-size: 12px; }
+  .sheet .instructions .inst-title { font-weight: 700; margin-bottom: 4px; }
+  .sheet .question-block { margin: 16px 0; page-break-inside: avoid; }
+  .sheet .question-text { font-weight: 700; margin-bottom: 8px; }
+  .sheet .question-text .pts { font-weight: 400; font-size: 12px; color: #333; }
+  .sheet .options { margin: 6px 0 6px 24px; }
+  .sheet .options .opt { margin-bottom: 4px; }
+  .sheet .answer-lines { margin: 10px 0 10px 24px; }
+  .sheet .answer-lines .line { border-bottom: 1px solid #999; height: 24px; margin-bottom: 6px; }
+  .sheet .tf-row { margin: 6px 0 6px 24px; }
+  .sheet .tf-box { display: inline-block; width: 60px; text-align: center; }
+  .sheet .pair-table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+  .sheet .pair-table td { border: 1px solid #000; padding: 6px 8px; width: 50%; vertical-align: top; }
+  .sheet .pair-table td.col-b { text-align: right; }
+  .sheet .pair-lines { margin: 10px 0 10px 24px; }
+  .sheet .pair-lines .line { border-bottom: 1px solid #999; height: 22px; margin-bottom: 6px; }
+  .sheet .image-in-question { margin: 8px 0; text-align: center; }
+  .sheet .image-in-question img { max-width: 100%; max-height: 120mm; }
+  .sheet .gap-blank { display: inline-block; min-width: 90px; border-bottom: 1px solid #000; }
+  .sheet .footer-note { text-align: center; font-size: 12px; margin-top: 24px; color: #333; }
+
+  /* Aviso de instalação PWA */
+  .install-banner {
+    display: none;
+    background: var(--primary);
+    color: #fff;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .install-banner.show { display: flex; }
+  .install-banner .btn { background: #fff; color: var(--primary); }
+
+  @media print {
+    body { background: #fff; }
+    .app-header, .tabs, .preview-toolbar, .tab-content, .install-banner { display: none !important; }
+    #printArea {
+      display: block !important;
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .sheet-wrap { background: #fff; padding: 0; }
+    .sheet { width: 100%; min-height: auto; margin: 0; padding: 0; box-shadow: none; }
+    @page { size: A4; margin: 0; }
+  }
+
+  /* Responsivo para mobile */
+  @media (max-width: 640px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    .app-header h1 { font-size: 16px; }
+    .tab { padding: 12px 10px; font-size: 13px; }
+    .sheet-wrap { padding: 8px; }
+    .sheet { transform: scale(0.9); transform-origin: top left; width: 233mm; }
+    .header-actions .btn { padding: 9px 12px; font-size: 13px; }
+  }
+</style>
 </head>
-
 <body>
 
-<div class="main">
 
-<h1>📚 Gerador de Provas</h1>
+  📱 Instale o Gerador de Provas no seu celular
+  <button class="btn btn-sm" id="installBtn">Instalar</button>
 
-<div class="botoes">
-<button onclick="adicionarQuestao('multipla')">Múltipla</button>
-<button onclick="adicionarQuestao('vf')">V/F</button>
-<button onclick="adicionarQuestao('dissertativa')">Dissertativa</button>
-<button onclick="adicionarQuestao('curta')">Curta</button>
-<button onclick="adicionarQuestao('lacuna')">Lacuna</button>
-<button onclick="adicionarQuestao('colunas')">Colunas</button>
-<button onclick="adicionarQuestao('ordenar')">Ordenar</button>
-<button onclick="adicionarQuestao('circule')">Circule</button>
-<button onclick="adicionarQuestao('arme')">Arme</button>
-</div>
 
-<button class="export" onclick="window.print()">📄 Exportar PDF</button>
 
-<div class="cabecalho">
-<input placeholder="Nome da Escola">
-<input placeholder="Disciplina">
-<input placeholder="Professor(a)">
-<input placeholder="Série / Ano">
-<input placeholder="Data">
 
-<div class="linha-aluno">
-Nome: ____________________________________________<br><br>
-Nota: ______
-</div>
-</div>
+<header class="app-header">
+  <h1>📝 Gerador de Provas</h1>
+  
+    <button class="btn btn-outline" onclick="exportWord()">⬇️ Word</button>
+    <button class="btn btn-primary" onclick="exportPDF()">🖨️ PDF</button>
+  
 
-<div id="prova"></div>
 
-</div>
+</header>
 
-<script src="app.js?v=3"></script>
+
+  <button class="tab active" data-tab="geracao" onclick="switchTab('geracao')">✏️ Geração</button>
+  <button class="tab" data-tab="visualizacao" onclick="switchTab('visualizacao')">👁️ Visualização</button>
+
+
+
+
+
+
+
+  
+  
+    🏫 Cabeçalho da Prova
+
+
+    
+      
+        <label>Nome da Escola</label>
+        <input type="text" id="f-escola" placeholder="Ex.: Escola Municipal de Ensino Fundamental" oninput="onChange()">
+      
+
+
+      
+        <label>Professor(a)</label>
+        <input type="text" id="f-professor" placeholder="Nome do professor" oninput="onChange()">
+      
+
+
+      
+        <label>Disciplina</label>
+        <input type="text" id="f-disciplina" placeholder="Ex.: Matemática" oninput="onChange()">
+      
+
+
+      
+        <label>Turma</label>
+        <input type="text" id="f-turma" placeholder="Ex.: 5º Ano A" oninput="onChange()">
+      
+
+
+      
+        <label>Data</label>
+        <input type="text" id="f-data" placeholder="Ex.: 10/05/2026" oninput="onChange()">
+      
+
+
+      
+        <label>Título da Prova</label>
+        <input type="text" id="f-titulo" placeholder="Ex.: Avaliação Bimestral" oninput="onChange()">
+      
+
+
+      
+        <label>Valor Total (pontos)</label>
+        <input type="number" id="f-valor" placeholder="Ex.: 10" oninput="onChange()">
+      
+
+
+      
+        <label>Instruções Gerais</label>
+        <textarea id="f-instrucoes" rows="2" placeholder="Ex.: Leia com atenção. Responda com caneta azul ou preta." oninput="onChange()"></textarea>
+      
+
+
+    
+
+
+  
+
+
+
+  
+  
+    📐 Formatação da Folha
+
+
+    
+      
+        <label>Fonte</label>
+        <select id="f-fonte" onchange="onChange()">
+          <option value="times">Times New Roman (serifada)</option>
+          <option value="arial">Arial (sem serifa)</option>
+        </select>
+      
+
+
+      
+        <label>Tamanho da letra</label>
+        <select id="f-tamanho" onchange="onChange()">
+          <option value="12">12</option>
+          <option value="13">13</option>
+          <option value="14" selected>14</option>
+          <option value="15">15</option>
+          <option value="16">16</option>
+        </select>
+      
+
+
+      
+        <label>Mostrar linha "Aluno(a)"</label>
+        <select id="f-aluno" onchange="onChange()">
+          <option value="1">Sim</option>
+          <option value="0">Não</option>
+        </select>
+      
+
+
+    
+
+
+  
+
+
+
+  
+  
+
+
+
+  
+  
+    🧠 Questões
+
+
+    
+
+
+    
+      📋
+
+
+      Nenhuma questão adicionada ainda.
+Clique no botão abaixo para começar.
+
+
+      <button class="btn btn-primary" onclick="showTypeSelector()">➕ Adicionar Nova Questão</button>
+    
+
+
+    
+      Escolha o tipo de questão:
+
+
+      
+
+
+    
+
+
+    
+      <button class="btn btn-primary" onclick="showTypeSelector()">➕ Adicionar Nova Questão</button>
+    
+
+
+  
+
+
+
+
+
+
+
+
+  
+    Atualização em tempo real.
+
+
+    
+      <button class="btn btn-outline" onclick="exportWord()">⬇️ Word</button>
+      <button class="btn btn-primary" onclick="exportPDF()">🖨️ PDF</button>
+    
+
+
+  
+
+
+  
+    
+
+
+  
+
+
+
+
+
 
 <script>
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
-</script>
+/* ============ GLOBAL ============ */
+let questions = [];
+let nextId = 1;
+const STORAGE_KEY = 'gerador-provas-v1';
 
+const TYPE_DEFS = {
+  'multipla': { name: 'Múltipla Escolha', icon: '🔘', desc: 'Uma única alternativa correta', config: { items: 4, itemsText: [] } },
+  'multiplas': { name: 'Múltiplas Respostas', icon: '☑️', desc: 'Mais de uma alternativa correta', config: { items: 4, itemsText: [] } },
+  'verdadeiro-falso': { name: 'Verdadeiro ou Falso', icon: '⚖️', desc: 'Marque V ou F', config: { statements: 2, statementsText: [] } },
+  'dissertacao': { name: 'Dissertação', icon: '✍️', desc: 'Resposta escrita com linhas', config: { lines: 5 } },
+  'ligue': { name: 'Ligue os Pontos', icon: '🔗', desc: 'Correspondência entre colunas', config: { pairs: 3, pairsText: [] } },
+  'imagem': { name: 'Questão com Imagem', icon: '🖼️', desc: 'Enunciado com imagem anexada', config: { imageMode: 'file', imageData: '' } },
+  'completar': { name: 'Complete as Lacunas', icon: '✏️', desc: 'Preencha os espaços em branco', config: { blanks: 3 } },
+  'associacao': { name: 'Associação de Colunas', icon: '🔀', desc: 'Relacione itens entre colunas', config: { pairs: 3, pairsText: [] } }
+};
+
+/* ============ PERSISTÊNCIA LOCAL ============ */
+function saveState() {
+  const state = {
+    questions: questions,
+    nextId: nextId,
+    header: {
+      escola: val('f-escola'), professor: val('f-professor'), disciplina: val('f-disciplina'),
+      turma: val('f-turma'), data: val('f-data'), titulo: val('f-titulo'),
+      valor: val('f-valor'), instrucoes: val('f-instrucoes')
+    },
+    settings: {
+      fonte: val('f-fonte'), tamanho: val('f-tamanho'), aluno: val('f-aluno')
+    }
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    if (state.questions) questions = state.questions;
+    if (state.nextId) nextId = state.nextId;
+    if (state.header) {
+      setVal('f-escola', state.header.escola); setVal('f-professor', state.header.professor);
+      setVal('f-disciplina', state.header.disciplina); setVal('f-turma', state.header.turma);
+      setVal('f-data', state.header.data); setVal('f-titulo', state.header.titulo);
+      setVal('f-valor', state.header.valor); setVal('f-instrucoes', state.header.instrucoes);
+    }
+    if (state.settings) {
+      setVal('f-fonte', state.settings.fonte); setVal('f-tamanho', state.settings.tamanho);
+      setVal('f-aluno', state.settings.aluno);
+    }
+  } catch (e) { /* ignore */ }
+}
+
+function onChange() {
+  renderPreview();
+  saveState();
+}
+
+/* ============ ABA ============ */
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.getElementById('tab-geracao').classList.toggle('active', name === 'geracao');
+  document.getElementById('tab-visualizacao').classList.toggle('active', name === 'visualizacao');
+  if (name === 'visualizacao') renderPreview();
+}
+
+/* ============ SELETOR DE TIPOS ============ */
+function showTypeSelector() {
+  const sel = document.getElementById('type-selector');
+  sel.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'type-selector';
+  for (const [key, def] of Object.entries(TYPE_DEFS)) {
+    const btn = document.createElement('button');
+    btn.className = 'type-option';
+    btn.innerHTML = `${def.icon}${def.name}${def.desc}`;
+    btn.onclick = () => addQuestion(key);
+    grid.appendChild(btn);
+  }
+  sel.appendChild(grid);
+  sel.style.display = 'block';
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('add-btn-wrap').style.display = 'block';
+  sel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* ============ ADICIONAR QUESTÃO ============ */
+function addQuestion(type) {
+  const q = {
+    id: nextId++,
+    type: type,
+    enunciado: '',
+    pontos: 1,
+    config: JSON.parse(JSON.stringify(TYPE_DEFS[type].config))
+  };
+  questions.push(q);
+  renderQuestions();
+  document.getElementById('type-selector').style.display = 'none';
+  onChange();
+}
+
+/* ============ REORDENAR / DUPLICAR ============ */
+function moveQuestion(id, dir) {
+  const idx = questions.findIndex(x => x.id === id);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= questions.length) return;
+  const [q] = questions.splice(idx, 1);
+  questions.splice(newIdx, 0, q);
+  renderQuestions();
+  onChange();
+}
+
+function duplicateQuestion(id) {
+  const idx = questions.findIndex(x => x.id === id);
+  const copy = JSON.parse(JSON.stringify(questions[idx]));
+  copy.id = nextId++;
+  questions.splice(idx + 1, 0, copy);
+  renderQuestions();
+  onChange();
+}
+
+function removeQuestion(id) {
+  questions = questions.filter(x => x.id !== id);
+  renderQuestions();
+  onChange();
+}
+
+/* ============ RENDERIZAR LISTA (ABA 1) ============ */
+function renderQuestions() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  document.getElementById('empty-state').style.display = questions.length ? 'none' : 'block';
+  document.getElementById('add-btn-wrap').style.display = questions.length ? 'block' : 'none';
+
+  questions.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    const def = TYPE_DEFS[q.type];
+
+    // Cabeçalho do card
+    const head = document.createElement('div');
+    head.className = 'question-head';
+    head.innerHTML = `Questão ${idx + 1}${def.icon} ${def.name}`;
+    const actions = document.createElement('div');
+    actions.className = 'q-actions';
+    actions.innerHTML = `
+      <button class="btn-icon" title="Subir" onclick="moveQuestion(${q.id}, -1)">↑</button>
+      <button class="btn-icon" title="Descer" onclick="moveQuestion(${q.id}, 1)">↓</button>
+      <button class="btn-icon" title="Duplicar" onclick="duplicateQuestion(${q.id})">⧉</button>
+      <button class="btn-icon danger" title="Remover" onclick="removeQuestion(${q.id})">🗑️</button>
+    `;
+    head.appendChild(actions);
+
+    // Corpo
+    const body = document.createElement('div');
+    body.className = 'question-body';
+
+    const fEn = document.createElement('div');
+    fEn.className = 'field';
+    fEn.innerHTML = '<label>Enunciado</label>';
+    const ta = document.createElement('textarea');
+    ta.value = q.enunciado;
+    ta.rows = 2;
+    ta.oninput = e => { q.enunciado = e.target.value; onChange(); };
+    fEn.appendChild(ta);
+
+    const fPts = document.createElement('div');
+    fPts.className = 'field';
+    fPts.innerHTML = '<label>Pontos</label>';
+    const inpPts = document.createElement('input');
+    inpPts.type = 'number';
+    inpPts.min = '0';
+    inpPts.step = '0.5';
+    inpPts.value = q.pontos;
+    inpPts.oninput = e => { q.pontos = parseFloat(e.target.value) || 0; onChange(); };
+    fPts.appendChild(inpPts);
+
+    const gridTop = document.createElement('div');
+    gridTop.className = 'grid-4';
+    gridTop.appendChild(fEn);
+    fEn.classList.add('full');
+    gridTop.appendChild(fPts);
+    body.appendChild(gridTop);
+
+    body.appendChild(buildConfig(q));
+
+    card.appendChild(head);
+    card.appendChild(body);
+    container.appendChild(card);
+  });
+}
+
+/* ============ CONFIG POR TIPO ============ */
+function buildConfig(q) {
+  const section = document.createElement('div');
+  section.className = 'config-section';
+  const title = document.createElement('div');
+  title.className = 'config-title';
+  title.textContent = 'Configurações da questão';
+  section.appendChild(title);
+
+  switch (q.type) {
+    case 'multipla':
+    case 'multiplas': {
+      const wrap = document.createElement('div');
+      const fCount = document.createElement('div');
+      fCount.className = 'field';
+      fCount.innerHTML = '<label>Quantidade de itens</label>';
+      const inp = document.createElement('input');
+      inp.type = 'number'; inp.min = '2'; inp.max = '10'; inp.value = q.config.items;
+      inp.oninput = e => { q.config.items = Math.max(2, parseInt(e.target.value) || 2); renderQuestions(); onChange(); };
+      fCount.appendChild(inp);
+      wrap.appendChild(fCount);
+      const itemsWrap = document.createElement('div');
+      itemsWrap.style.marginTop = '12px';
+      renderItems(q, itemsWrap);
+      wrap.appendChild(itemsWrap);
+      section.appendChild(wrap);
+      break;
+    }
+    case 'verdadeiro-falso': {
+      const fCount = document.createElement('div');
+      fCount.className = 'field';
+      fCount.innerHTML = '<label>Quantidade de afirmações</label>';
+      const inp = document.createElement('input');
+      inp.type = 'number'; inp.min = '1'; inp.max = '10'; inp.value = q.config.statements;
+      inp.oninput = e => { q.config.statements = Math.max(1, parseInt(e.target.value) || 1); renderQuestions(); onChange(); };
+      fCount.appendChild(inp);
+      const listWrap = document.createElement('div');
+      listWrap.style.marginTop = '12px';
+      renderStatements(q, listWrap);
+      section.appendChild(fCount);
+      section.appendChild(listWrap);
+      break;
+    }
+    case 'dissertacao': {
+      const fLines = document.createElement('div');
+      fLines.className = 'field';
+      fLines.innerHTML = '<label>Linhas para a resposta</label>';
+      const inp = document.createElement('input');
+      inp.type = 'number'; inp.min = '1'; inp.max = '20'; inp.value = q.config.lines;
+      inp.oninput = e => { q.config.lines = Math.max(1, parseInt(e.target.value) || 1); onChange(); };
+      fLines.appendChild(inp);
+      section.appendChild(fLines);
+      break;
+    }
+    case 'ligue':
+    case 'associacao': {
+      const fCount = document.createElement('div');
+      fCount.className = 'field';
+      fCount.innerHTML = '<label>Quantidade de pares</label>';
+      const inp = document.createElement('input');
+      inp.type = 'number'; inp.min = '1'; inp.max = '10'; inp.value = q.config.pairs;
+      inp.oninput = e => { q.config.pairs = Math.max(1, parseInt(e.target.value) || 1); renderQuestions(); onChange(); };
+      fCount.appendChild(inp);
+      section.appendChild(fCount);
+      const pairsWrap = document.createElement('div');
+      pairsWrap.style.marginTop = '12px';
+      renderPairs(q, pairsWrap);
+      section.appendChild(pairsWrap);
+      break;
+    }
+    case 'imagem': {
+      const modeWrap = document.createElement('div');
+      const fMode = document.createElement('div');
+      fMode.className = 'field';
+      fMode.innerHTML = '<label>Origem da imagem</label>';
+      const sel = document.createElement('select');
+      sel.innerHTML = `<option value="file">Enviar arquivo</option><option value="link">Usar link (URL)</option>`;
+      sel.value = q.config.imageMode || 'file';
+      sel.onchange = e => { q.config.imageMode = e.target.value; q.config.imageData = ''; renderQuestions(); onChange(); };
+      fMode.appendChild(sel);
+      modeWrap.appendChild(fMode);
+
+      if (q.config.imageMode === 'file') {
+        const area = document.createElement('div');
+        area.className = 'image-upload-area';
+        area.textContent = '📁 Clique para anexar uma imagem';
+        const file = document.createElement('input');
+        file.type = 'file'; file.accept = 'image/*'; file.style.display = 'none';
+        file.onchange = e => {
+          const fr = new FileReader();
+          fr.onload = ev => { q.config.imageData = ev.target.result; renderQuestions(); onChange(); };
+          fr.readAsDataURL(e.target.files[0]);
+        };
+        area.onclick = () => file.click();
+        area.appendChild(file);
+        modeWrap.appendChild(area);
+        if (q.config.imageData) {
+          const prev = document.createElement('div');
+          prev.className = 'image-preview';
+          prev.innerHTML = `<img src="${q.config.imageData}" alt="Pré-visualização">`;
+          modeWrap.appendChild(prev);
+        }
+      } else {
+        const fLink = document.createElement('div');
+        fLink.className = 'field';
+        fLink.innerHTML = '<label>URL da imagem</label>';
+        const inp = document.createElement('input');
+        inp.type = 'url';
+        inp.placeholder = 'https://exemplo.com/imagem.png';
+        inp.value = q.config.imageData && q.config.imageData.startsWith('http') ? q.config.imageData : '';
+        inp.oninput = e => { q.config.imageData = e.target.value; onChange(); };
+        fLink.appendChild(inp);
+        modeWrap.appendChild(fLink);
+        if (q.config.imageData && q.config.imageData.startsWith('http')) {
+          const prev = document.createElement('div');
+          prev.className = 'image-preview';
+          prev.innerHTML = `<img src="${q.config.imageData}" alt="Pré-visualização">`;
+          modeWrap.appendChild(prev);
+        }
+      }
+      section.appendChild(modeWrap);
+      break;
+    }
+    case 'completar': {
+      const fCount = document.createElement('div');
+      fCount.className = 'field';
+      fCount.innerHTML = '<label>Quantidade de lacunas</label>';
+      const inp = document.createElement('input');
+      inp.type = 'number'; inp.min = '1'; inp.max = '15'; inp.value = q.config.blanks;
+      inp.oninput = e => { q.config.blanks = Math.max(1, parseInt(e.target.value) || 1); onChange(); };
+      fCount.appendChild(inp);
+      section.appendChild(fCount);
+      const hint = document.createElement('div');
+      hint.style.cssText = 'font-size:12px;color:var(--text-soft);margin-top:8px;';
+      hint.innerHTML = '💡 Use **___** (três sublinhados) no enunciado para indicar cada lacuna.';
+      section.appendChild(hint);
+      break;
+    }
+  }
+  return section;
+}
+
+/* ============ ITENS ============ */
+function renderItems(q, wrap) {
+  wrap.innerHTML = '';
+  if (!q.config.itemsText) q.config.itemsText = [];
+  while (q.config.itemsText.length < q.config.items) q.config.itemsText.push('');
+  q.config.itemsText.length = q.config.items;
+
+  q.config.itemsText.forEach((txt, i) => {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    const label = document.createElement('span');
+    label.className = 'item-label';
+    label.textContent = String.fromCharCode(65 + i);
+    const inp = document.createElement('input');
+    inp.placeholder = `Alternativa ${label.textContent}`;
+    inp.value = txt;
+    inp.oninput = e => { q.config.itemsText[i] = e.target.value; onChange(); };
+    const del = document.createElement('button');
+    del.className = 'btn-remove-item';
+    del.textContent = '✕';
+    del.onclick = () => {
+      q.config.itemsText.splice(i, 1);
+      q.config.items = Math.max(2, q.config.items - 1);
+      renderQuestions(); onChange();
+    };
+    row.appendChild(label); row.appendChild(inp); row.appendChild(del);
+    wrap.appendChild(row);
+  });
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-item-btn';
+  addBtn.textContent = '+ Adicionar item';
+  addBtn.onclick = () => { q.config.items = Math.min(10, q.config.items + 1); renderQuestions(); onChange(); };
+  wrap.appendChild(addBtn);
+}
+
+/* ============ AFIRMAÇÕES ============ */
+function renderStatements(q, wrap) {
+  wrap.innerHTML = '';
+  if (!q.config.statementsText) q.config.statementsText = [];
+  while (q.config.statementsText.length < q.config.statements) q.config.statementsText.push('');
+  q.config.statementsText.length = q.config.statements;
+
+  q.config.statementsText.forEach((txt, i) => {
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    const label = document.createElement('span');
+    label.className = 'item-label';
+    label.textContent = i + 1;
+    const inp = document.createElement('input');
+    inp.placeholder = `Afirmação ${i + 1}`;
+    inp.value = txt;
+    inp.oninput = e => { q.config.statementsText[i] = e.target.value; onChange(); };
+    const del = document.createElement('button');
+    del.className = 'btn-remove-item';
+    del.textContent = '✕';
+    del.onclick = () => {
+      q.config.statementsText.splice(i, 1);
+      q.config.statements = Math.max(1, q.config.statements - 1);
+      renderQuestions(); onChange();
+    };
+    row.appendChild(label); row.appendChild(inp); row.appendChild(del);
+    wrap.appendChild(row);
+  });
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-item-btn';
+  addBtn.textContent = '+ Adicionar afirmação';
+  addBtn.onclick = () => { q.config.statements = Math.min(10, q.config.statements + 1); renderQuestions(); onChange(); };
+  wrap.appendChild(addBtn);
+}
+
+/* ============ PARES ============ */
+function renderPairs(q, wrap) {
+  wrap.innerHTML = '';
+  if (!q.config.pairsText) q.config.pairsText = [];
+  while (q.config.pairsText.length < q.config.pairs) q.config.pairsText.push({ left: '', right: '' });
+  q.config.pairsText.length = q.config.pairs;
+
+  q.config.pairsText.forEach((pair, i) => {
+    const row = document.createElement('div');
+    row.className = 'pair-row';
+    const l = document.createElement('input');
+    l.placeholder = `Coluna A - item ${i + 1}`;
+    l.value = pair.left;
+    l.oninput = e => { pair.left = e.target.value; onChange(); };
+    const arrow = document.createElement('span');
+    arrow.className = 'arrow';
+    arrow.textContent = '↔';
+    const r = document.createElement('input');
+    r.placeholder = `Coluna B - item ${i + 1}`;
+    r.value = pair.right;
+    r.oninput = e => { pair.right = e.target.value; onChange(); };
+    const del = document.createElement('button');
+    del.className = 'btn-remove-item';
+    del.textContent = '✕';
+    del.onclick = () => {
+      q.config.pairsText.splice(i, 1);
+      q.config.pairs = Math.max(1, q.config.pairs - 1);
+      renderQuestions(); onChange();
+    };
+    row.appendChild(l); row.appendChild(arrow); row.appendChild(r); row.appendChild(del);
+    wrap.appendChild(row);
+  });
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-item-btn';
+  addBtn.textContent = '+ Adicionar par';
+  addBtn.onclick = () => { q.config.pairs = Math.min(10, q.config.pairs + 1); renderQuestions(); onChange(); };
+  wrap.appendChild(addBtn);
+}
+
+/* ============ RENDERIZAR PREVIEW ============ */
+function renderPreview() {
+  const area = document.getElementById('printArea');
+  const escola = val('f-escola');
+  const professor = val('f-professor');
+  const disciplina = val('f-disciplina');
+  const turma = val('f-turma');
+  const data = val('f-data');
+  const titulo = val('f-titulo') || 'Prova';
+  const valor = val('f-valor');
+  const instrucoes = val('f-instrucoes');
+  const mostrarAluno = val('f-aluno') !== '0';
+  const fonte = val('f-fonte') || 'times';
+  const tamanho = val('f-tamanho') || '14';
+
+  // Aplica fonte e tamanho na folha
+  area.style.fontFamily = fonte === 'arial' ? 'Arial, Helvetica, sans-serif' : "'Times New Roman', Georgia, serif";
+  area.style.fontSize = tamanho + 'px';
+
+  let totalPts = 0;
+  questions.forEach(q => totalPts += q.pontos || 0);
+
+  let html = '';
+
+  if (escola) html += `${esc(escola)}
+
+`;
+  html += `${esc(titulo)}
+
+`;
+  if (professor || disciplina || turma || data) {
+    html += `| Professor(a) | ${esc(professor)} |
+| --- | --- |
+| Disciplina | ${esc(disciplina)} |
+| Turma | ${esc(turma)} |
+| Data | ${esc(data)} |`;
+  }
+  if (instrucoes) {
+    html += `Instruções
+
+${esc(instrucoes)}
+
+`;
+  }
+  if (mostrarAluno) {
+    html += `| Aluno(a) |   |
+| --- | --- |`;
+  }
+
+  if (questions.length === 0) {
+    html += `Nenhuma questão adicionada.
+
+`;
+  } else {
+    questions.forEach((q, idx) => {
+      html += ``;
+      html += `${idx + 1}) ${esc(q.enunciado) || '*[Sem enunciado]*'} (${q.pontos || 0} pts)
+
+`;
+      html += renderQuestionBody(q);
+      html += `
+
+`;
+    });
+  }
+
+  html += `Boa prova! — Total: ${totalPts} pontos${valor ? ' / ' + valor + ' pontos' : ''}
+
+`;
+
+  area.innerHTML = html;
+  document.getElementById('preview-info').textContent =
+    `${questions.length} questão(ões) · ${totalPts} pontos`;
+
+  // Aviso de soma de pontos
+  const warn = document.getElementById('pointsWarning');
+  if (valor && parseFloat(valor) > 0 && Math.abs(totalPts - parseFloat(valor)) > 0.01) {
+    warn.textContent = `⚠️ A soma das questões (${totalPts} pts) não bate com o valor total informado (${valor} pts).`;
+    warn.classList.add('show');
+  } else {
+    warn.classList.remove('show');
+  }
+}
+
+function renderQuestionBody(q) {
+  switch (q.type) {
+    case 'multipla':
+    case 'multiplas': {
+      let h = '';
+      (q.config.itemsText || []).forEach((t, i) => {
+        h += `${String.fromCharCode(65 + i)}) ${esc(t) || ' '}
+
+`;
+      });
+      h += '
+
+';
+      return h;
+    }
+    case 'verdadeiro-falso': {
+      let h = '';
+      (q.config.statementsText || []).forEach((t, i) => {
+        h += `${i + 1}) ${esc(t) || ' '} ( ) V ( ) F
+
+`;
+      });
+      h += '
+
+';
+      return h;
+    }
+    case 'dissertacao': {
+      let h = '';
+      for (let i = 0; i < (q.config.lines || 5); i++) h += '
+
+';
+      h += '
+
+';
+      return h;
+    }
+    case 'ligue': {
+      const pairs = q.config.pairsText || [];
+      let h = '| Coluna A | Coluna B |
+| --- | --- |
+| ${left} | ${right} |';
+      for (let i = 0; i < maxLen; i++) h += '
+
+';
+      h += '
+
+';
+      return h;
+    }
+    case 'associacao': {
+      const pairs = q.config.pairsText || [];
+      let h = '| Coluna A | Coluna B |
+| --- | --- |
+| ${i + 1}) ${left} | ${String.fromCharCode(65 + i)}) ${right} |';
+      for (let i = 0; i < maxLen; i++) h += '
+
+';
+      h += '
+
+';
+      return h;
+    }
+    case 'imagem': {
+      let h = '';
+      if (q.config.imageData) {
+        h += `<img src="${q.config.imageData}" alt="Imagem da questão">
+
+`;
+      }
+      return h;
+    }
+    case 'completar': {
+      const blanks = q.config.blanks || 3;
+      let h = '';
+      for (let i = 0; i < blanks; i++) h += `  `;
+      h += '
+
+';
+      return h;
+    }
+    default:
+      return '';
+  }
+}
+
+/* ============ HELPERS ============ */
+function val(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v || ''; }
+function esc(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({
+    '&': '&', '<': '<', '>': '>', '"': '"', "'": '''
+  }[c]));
+}
+
+/* ============ EXPORTAR WORD ============ */
+function exportWord() {
+  renderPreview();
+  const content = document.getElementById('printArea').innerHTML;
+  const fonte = val('f-fonte') || 'times';
+  const tamanho = val('f-tamanho') || '14';
+  const fontFamily = fonte === 'arial' ? 'Arial, Helvetica, sans-serif' : "'Times New Roman', Georgia, serif";
+  const css = `
+    <style>
+      @page WordSection1 { size: 841.95pt 595.35pt; mso-page-orientation: portrait; margin: 2cm 1.8cm; }
+      div.WordSection1 { page: WordSection1; }
+      body { font-family: ${fontFamily}; font-size: ${tamanho}pt; color: #000; line-height: 1.6; }
+      .school-name { text-align: center; font-size: ${tamanho + 2}pt; font-weight: bold; text-transform: uppercase; }
+      .title { text-align: center; font-size: ${tamanho + 4}pt; font-weight: bold; margin: 8px 0; }
+      .header-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+      .header-table td { border: 1px solid #000; padding: 4px 8px; }
+      .header-table td.label { font-weight: bold; width: 110px; }
+      .instructions { border: 1px solid #000; padding: 8px 12px; margin: 12px 0; font-size: ${tamanho - 2}pt; }
+      .instructions .inst-title { font-weight: bold; }
+      .question-block { margin: 14px 0; }
+      .question-text { font-weight: bold; margin-bottom: 6px; }
+      .question-text .pts { font-weight: normal; font-size: ${tamanho - 2}pt; }
+      .options { margin: 6px 0 6px 24px; }
+      .options .opt { margin-bottom: 3px; }
+      .answer-lines { margin: 8px 0 8px 24px; }
+      .answer-lines .line { border-bottom: 1px solid #999; height: 22px; margin-bottom: 5px; }
+      .tf-row { margin: 6px 0 6px 24px; }
+      .tf-box { display: inline-block; width: 60px; }
+      .pair-table { width: 100%; border-collapse: collapse; margin: 8px 0; }
+      .pair-table td { border: 1px solid #000; padding: 5px 8px; width: 50%; vertical-align: top; }
+      .pair-table td.col-b { text-align: right; }
+      .pair-lines { margin: 8px 0 8px 24px; }
+      .pair-lines .line { border-bottom: 1px solid #999; height: 20px; margin-bottom: 5px; }
+      .image-in-question { margin: 8px 0; text-align: center; }
+      .image-in-question img { max-width: 100%; max-height: 300px; }
+      .gap-blank { display: inline-block; min-width: 90px; border-bottom: 1px solid #000; }
+      .footer-note { text-align: center; font-size: ${tamanho - 2}pt; margin-top: 20px; }
+    </style>`;
+  const header = `<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Prova</title>${css}</head><body>`;
+  const footer = `
+
+</body></html>`;
+  const full = header + content + footer;
+  const blob = new Blob(['\ufeff', full], { type: 'application/msword' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = (val('f-titulo') || 'prova') + '.doc';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ============ EXPORTAR PDF ============ */
+function exportPDF() {
+  renderPreview();
+  switchTab('visualizacao');
+  setTimeout(() => window.print(), 100);
+}
+
+/* ============ PWA: INSTALAÇÃO ============ */
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const choice = await deferredPrompt.userChoice;
+  if (choice.outcome === 'accepted') {
+    document.getElementById('installBanner').classList.remove('show');
+  }
+  deferredPrompt = null;
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('show');
+});
+
+/* ============ INICIALIZAÇÃO ============ */
+loadState();
+renderQuestions();
+renderPreview();
+</script>
 </body>
 </html>
